@@ -1,6 +1,6 @@
 const A = { coords: { x: 100, y: 200 }, label: "A" };
 const B = { coords: { x: 400, y: 300 }, label: "B" };
-const MousePointer = { coords: { x: 250, y: 250 }, label: "Mouse" };
+const MousePointer = { coords: { x: 250, y: 250 }, label: "Moving vector" };
 
 const segmentPoints = [A, B];
 const allPoints = [A, B, MousePointer];
@@ -64,12 +64,14 @@ const redrawAll = () => {
   drawArrow(result.point, MousePointer.coords);
 };
 
+// Set event listeners to change the position for the moving vector
 WORKSPACE.addEventListener("mousemove", (event) => {
   MousePointer.coords.x = event.offsetX;
   MousePointer.coords.y = event.offsetY;
   redrawAll();
 });
 
+// Set event listeners to amend segment
 WORKSPACE.addEventListener("click", (event) => {
   A.coords.x = event.offsetX;
   A.coords.y = event.offsetY;
