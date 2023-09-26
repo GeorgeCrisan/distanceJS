@@ -6,12 +6,12 @@ const segmentPoints = [A, B];
 const allPoints = [A, B, MousePointer];
 
 // Narrow the mouse pointer between A and B vectors
-const projectPointToSegment = (vector, limitA, limitB) => {
+const projectPointToSegment = (vector, A, B) => {
   const AB = subtract(B.coords, A.coords);
   // Debug only
   // drawArrow(add(AB, A.coords), A.coords);
 
-  const AM = subtract(MousePointer.coords, A.coords);
+  const AM = subtract(vector.coords, A.coords);
   // Debug only
   // drawArrow(add(AM, A.coords), A.coords);
 
@@ -26,31 +26,42 @@ const projectPointToSegment = (vector, limitA, limitB) => {
   return { P, t };
 };
 
-const redrawAll = () => {
-  clearCanvas();
-  segmentPoints.forEach((point) => drawDot(point.coords, point.label));
-  drawSegment(A.coords, B.coords);
-  drawDot(MousePointer.coords, MousePointer.label);
-
+const calculateDistanceFromVectorToSegment = (MousePointer, A, B) => {
   const { P, t } = projectPointToSegment(MousePointer, A, B);
-  drawDot(P, "P");
+
+  let distanceResult;
+  let point = P;
 
   // Calculate distance from point to segment
   if (t >= 0 && t <= 1) {
-    drawText(distance(MousePointer.coords, P));
-    drawArrow(P, MousePointer.coords);
+    distanceResult = distance(MousePointer.coords, P);
   } else {
     const distToA = distance(MousePointer.coords, A.coords);
     const distToB = distance(MousePointer.coords, B.coords);
 
     if (distToA < distToB) {
-      drawText(distToA);
-      drawArrow(A.coords, MousePointer.coords);
+      distanceResult = distToA;
+      point = A.coords;
     } else {
-      drawText(distToB);
-      drawArrow(B.coords, MousePointer.coords);
+      distanceResult = distToB;
+      point = B.coords;
     }
   }
+
+  return { distanceResult, point };
+};
+
+const redrawAll = () => {
+  clearCanvas();
+  segmentPoints.forEach((point) => drawDot(point.coords, point.label));
+  drawSegment(A.coords, B.coords);
+  drawDot(MousePointer.coords, MousePointer.label);
+  const result = calculateDistanceFromVectorToSegment(MousePointer, A, B);
+
+  // Draw info
+  drawDot(result.point, "P");
+  drawText(result.distanceResult.toFixed(2));
+  drawArrow(result.point, MousePointer.coords);
 };
 
 WORKSPACE.addEventListener("mousemove", (event) => {
